@@ -344,10 +344,8 @@ def train_insurer(ins, train_df, test2_df, test3_df, base_feats, n_folds=3):
         'objective': 'regression_l1',
         'metric': 'mae',
         'boosting_type': 'gbdt',
-
-        'device': 'gpu',
-        'max_bin': 127,
-
+        'device': 'cuda',
+        'max_bin': 255,
         'num_leaves': cfg['num_leaves'],
         'learning_rate': 0.05,
         'feature_fraction': 0.7,
@@ -356,8 +354,7 @@ def train_insurer(ins, train_df, test2_df, test3_df, base_feats, n_folds=3):
         'min_child_samples': cfg['min_child_samples'],
         'reg_alpha': 0.3,
         'reg_lambda': 0.3,
-
-        'verbose': -1
+        'verbose': 1,
     }
 
     models = []

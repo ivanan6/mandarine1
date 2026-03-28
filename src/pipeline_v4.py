@@ -335,7 +335,7 @@ def train_insurer(ins, train_df, test2_df, test3_df, base_feats, n_folds=3):
 
     # Data
     mask = train_df[price_col].notna()
-    X = train_df.loc[mask, ins_features].to_numpy(dtype=np.float64, na_value=np.nan)
+    X = train_df.loc[mask, ins_features].to_numpy(dtype=np.float32, na_value=np.nan)
     y = train_df.loc[mask, price_col].to_numpy(dtype=np.float64, na_value=np.nan)
     print(f": {len(y):,} rows, {len(ins_features)} features")
 
@@ -344,6 +344,10 @@ def train_insurer(ins, train_df, test2_df, test3_df, base_feats, n_folds=3):
         'objective': 'regression_l1',
         'metric': 'mae',
         'boosting_type': 'gbdt',
+
+        'device': 'gpu',
+        'max_bin': 127,
+
         'num_leaves': cfg['num_leaves'],
         'learning_rate': 0.05,
         'feature_fraction': 0.7,
@@ -352,9 +356,8 @@ def train_insurer(ins, train_df, test2_df, test3_df, base_feats, n_folds=3):
         'min_child_samples': cfg['min_child_samples'],
         'reg_alpha': 0.3,
         'reg_lambda': 0.3,
-        'force_col_wise': True,
-        'verbose': -1,
-        'n_jobs': -1,
+
+        'verbose': -1
     }
 
     models = []
@@ -380,8 +383,8 @@ def train_insurer(ins, train_df, test2_df, test3_df, base_feats, n_folds=3):
     print(f"  CV MAE: {avg_mae:.2f} ({time.time()-t_ins:.0f}s)")
 
     # Predict
-    X_t2 = test2_df[ins_features].to_numpy(dtype=np.float64, na_value=np.nan)
-    X_t3 = test3_df[ins_features].to_numpy(dtype=np.float64, na_value=np.nan)
+    X_t2 = test2_df[ins_features].to_numpy(dtype=np.float32, na_value=np.nan)
+    X_t3 = test3_df[ins_features].to_numpy(dtype=np.float32, na_value=np.nan)
     pred2 = np.mean([m.predict(X_t2) for m in models], axis=0)
     pred3 = np.mean([m.predict(X_t3) for m in models], axis=0)
 
